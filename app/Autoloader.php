@@ -16,7 +16,7 @@ spl_autoload_register(
     function($classe) { // http://www.php.net/manual/it/functions.anonymous.php
 
         // la cartella base delle app
-        $base = PATH_BASE . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR;
+        $base = dirname(__FILE__) . DIRECTORY_SEPARATOR ;
 
         // sostituisco "_" con DIRECTORY_SEPARATOR in modo da caricare classi dentro le cartelle
         $classe = str_replace('_', DIRECTORY_SEPARATOR, $classe);
