@@ -1,13 +1,16 @@
 <?php
-
 /**
- * @version     0.1
- * @package	Concerto
- * @copyright	Copyright (C) 2003 - 2013 Open Source. All rights reserved.
- * @license	GNU/GPL version 3
- * @author 	Pietro Arturo Panetta arturopanetta@gmail.com
- * @todo	Core.
+ * Il core dell'applicazione
+ * 
+ * @version 0.1
+ * @package Concerto
+ * @class Core
+ * @copyright Copyright (C) 2003 - 2013 Open Source. All rights reserved.
+ * @license GNU/GPL version 3
+ * @author Pietro Arturo Panetta arturopanetta@gmail.com
+ * @todo Core.
  */
+
 namespace Concerto;
 
 class Core {
@@ -44,9 +47,9 @@ class Core {
     
     /**
      * @todo Metodo che avvia il sistema
-     * @access public static
+     * @access public
      */
-    public static function boot() {
+    public function boot() {
 //        // faccio partire Config
 //        Config::run();
 //        
