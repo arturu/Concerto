@@ -1,24 +1,26 @@
 <?php
-
 /**
  * Classe Config
  *
- * @version	0.1
- * @package	Concerto
- * @class 	Config
- * @todo 	modificare soltanto il contenuto tra le apici seguendo le istruzioni nel metodo default_setting()
+ * @version 0.1
+ * @package Concerto
+ * @class Config
+ * @copyright Copyright (C) 2003 - 2013 Open Source. All rights reserved.
+ * @license GNU/GPL version 3
+ * @author Pietro Arturo Panetta arturopanetta@gmail.com
+ * @todo modificare soltanto il contenuto tra le apici seguendo le istruzioni nel metodo default_setting()
  */
 
 namespace Concerto;
 
-class Config {
+class Config extends Singleton {
 
     /**
-     * @todo singleton pattern
+     * @todo istanza singleton
      * @access private
      * @var object
      */
-    private static $singleton;
+    protected static $singleton;
 
     /**
      * @todo array con le impostazioni
@@ -28,26 +30,11 @@ class Config {
     private $impostazioni = array();
 
     /**
-     * @todo Costruttore della classe
+     * @todo Costruttore della classe, invia la logica al costruttore padre
      *
      */
-    private function __construct() {
+    protected function costruttore() {
         $this->default_setting();
-    }
-
-    /**
-     * @todo Metodo che avvia il singleton in caso è avviato ritorna quello già avviato
-     * @access public static
-     */
-    public static function run() {
-        // in caso non è settato il $singleton lo costruisco
-        if (!isset(self::$singleton)){
-            $classe = __CLASS__ ;
-            self::$singleton = new $classe;
-        }
-
-        //restituisco in ogni caso l'oggetto
-        return self::$singleton;
     }
 
     /**
