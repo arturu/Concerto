@@ -13,37 +13,22 @@
 
 namespace Concerto;
 
-class Core {
+class Core extends Singleton {
     
     /**
-     * @todo singleton pattern
+     * @todo istanza singleton
      * @access public
      * @var object
      */
-    public static $singleton ;
+    protected static $singleton ;
     
     /**
-     * @todo Costruttore della classe
+     * @todo Costruttore della classe, invia la logica al costruttore padre
      *
      */
-    private function __construct(){
+    protected function costruttore(){
         $this->boot();
-    } // fine __construct
-    
-    /**
-     * @todo Metodo che avvia il singleton in caso è avviato ritorna quello già avviato
-     * @access public static
-     */
-    public static function run() {
-        // in caso non è settato il $singleton lo costruisco
-        if (!isset(self::$singleton)){
-            $classe = __CLASS__ ;
-            self::$singleton = new $classe;
-        }
-
-        //restituisco in ogni caso l'oggetto
-        return self::$singleton;
-    }
+    } // fine costruttore()
     
     /**
      * @todo Metodo che avvia il sistema
