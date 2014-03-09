@@ -2,11 +2,12 @@
 /**
  * Autoloader di classi
  * 
- * @version	0.2
- * @package	Autoload
- * @file 	Autoloader di classi.
- * 
- * @todo        Dato il nome della classe (namespace\Classe) carico la relativa classe.
+ * @version 0.2
+ * @package Autoload
+ * @copyright Copyright (C) 2003 - 2013 Open Source. All rights reserved.
+ * @license GNU/GPL version 3
+ * @author Pietro Arturo Panetta arturopanetta@gmail.com
+ * @todo Dato il nome della classe (namespace\Classe) carico la relativa classe.
  */
 spl_autoload_register(
     function($classe) {

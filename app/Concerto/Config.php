@@ -34,18 +34,21 @@ class Config extends Singleton {
      *
      */
     protected function costruttore() {
-        $this->default_setting();
+        $this->default_settings();
     }
 
     /**
      * @todo Metodo che setta le impostazioni di default
      * @access private
      */
-    private function default_setting() {
-        $this->impostazioni = array(
-            /* esempio */
-            'chiave'=>'valore',
-        );
+    private function default_settings() {
+        $this->set( array(
+            'url' => array( 
+                'lingua_in_url' => true, // se nell'url deve essere presente la lingua
+                'lingua_su_terzo_livello' => false, // se true la lingua è il terzo livello xx.dominio.tld
+                'formato_lingua' => 'xx', // impostare se deve essere nel formato "xx", "xx-XX" oppure "xx_XX"
+            )
+        ));
     }
     
     /**
@@ -56,6 +59,24 @@ class Config extends Singleton {
     public function get() {
         return $this->impostazioni;
     }
+    
+    /**
+     * @todo Metodo che restituisce solo le impostazioni specifiche dell'app
+     * @access public
+     * @return array Un array con le impostazioni specifiche
+     */
+    public function mie() {
+        // recupero la pila delle classi che hanno richiesto questa operazione
+        $pila = debug_backtrace();
+        
+        // prendo la classe dal penultimo elemento
+        $classe_richiedente = $pila[1]['class'];
+        
+        // return in base se esiste o meno il record
+        $return = (isset($this->impostazioni[$classe_richiedente])) ?$this->impostazioni[$classe_richiedente] : false ;
+        
+        return $return;
+    }
 
     /**
      * @todo Metodo che permette di cambiare alcune opzioni durante l'esecuzione
@@ -63,24 +84,14 @@ class Config extends Singleton {
      * @param array $set l'array con le impostazioni da modificare
      */
     public function set($set) {
-        $this->impostazioni = array_replace_recursive($this->impostazioni, $set);
-    }
+        // recupero la pila delle classi che hanno richiesto questa operazione
+        $pila = debug_backtrace();
+        
+        // prendo la classe dal penultimo elemento
+        $classe_richiedente = $pila[1]['class'];
 
-    /**
-     * @todo Metodo che reimposta i settaggi, utile durante l'esecuzione per reimpostare i settaggi
-     * @access public
-     */
-    public function reset() {
-        $this->default_setting();
-    }
-
-    /**
-     * @todo Metodo che permette alle altre applicazioni di aggiungere nuovi parametri
-     * @access public
-     * @param string $chiave Una chiave per identificare la radice delle impostazioni aggiunte
-     */
-    public function add($chiave,$array) {
-        $this->impostazioni[$chiave] = $array;
+        // aggiornamento/inserimento relativo all'app che ha richiesto l'operazione
+        $this->impostazioni = array_replace_recursive($this->impostazioni, array($classe_richiedente=>$set) );
     }
 
 }

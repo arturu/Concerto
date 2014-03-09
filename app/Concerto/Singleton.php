@@ -61,7 +61,7 @@ abstract class Singleton {
         }
         return static::$singleton;
     }
-
+    
     /**
      * @todo Dato che il singleton deve essere univoco evitiamo che possa essere clonato.
      */
