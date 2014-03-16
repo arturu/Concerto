@@ -1,0 +1,9 @@
+## YAML boot
+#- \Concerto\Security      # analizza gli input
+- \Concerto\Sessione      # il gestore della sessione
+- \Concerto\Locale        # gestore della localizzazione
+- \Concerto\Request       # gestore delle richieste
+- \Concerto\Routing       # routing
+- \Concerto\App           #gestore delle applicazioni
+#- \Concerto\Response      # gestore di response
+#- \Concerto\Template      # gestore di template

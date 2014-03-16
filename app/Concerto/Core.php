@@ -13,6 +13,12 @@
 
 namespace Concerto;
 
+// per poter utilizzare il parser YAML
+// si potrebbe anche evitare questa riga, ma alla riga 49 bisogna instanziare il parser con
+// $yaml = new \Symfony\Component\Yaml\Parser();
+// che non è molto bello
+use Symfony\Component\Yaml\Parser;
+
 class Core extends Singleton {
     
     /**
@@ -37,30 +43,21 @@ class Core extends Singleton {
      * @access public
      */
     public function boot() {
-       
-//        // faccio partire security
-//        Security::run();
-       
-        // faccio partire il getore della sessione
-        Sessione::run();
-       
-        // faccio partire la localizzazione
-        Locale::run();
-       
-        // faccio partire il gestore delle richieste
-        Request::run();
-       
-        // faccio partire il routing
-        Routing::run();
-       
-        // faccio partire le applicazioni
-        App::run();
+
+        // se non dichiarato il namespace all'inizio bisogna instanziare con
+        // $yaml = new \Symfony\Component\Yaml\Parser();
+        $yaml = new Parser(); 
         
-//        // setto il tipo di Response
-//        Response::run();
-       
-//        // faccio partire il sistema di templating
-//        Template::run();
+        $impostazioni = Config::run()->mie();
+        
+        $file = $impostazioni['path_app'] . DIRECTORY_SEPARATOR . 'Concerto' . DIRECTORY_SEPARATOR . 'boot.yml';
+
+        $core_boot = $yaml->parse(file_get_contents($file));
+
+        // avvio le applicazioni come da elenco
+        foreach ($core_boot as $value) {
+            $value::run();
+        }
         
     }
     
@@ -70,19 +67,22 @@ class Core extends Singleton {
     private function set(){
         
         // recupero il nome della pagina php usata come front controller
-        $front_controller = explode('/' , $_SERVER['SCRIPT_NAME']);
+        $front_controller = explode( DIRECTORY_SEPARATOR , $_SERVER['SCRIPT_NAME'] );
         
         // prendo l'ultimo elemento di $_SERVER['SCRIPT_NAME']
         $front_controller = end( $front_controller );
         
         // recupero la cartella dove è installato il framework a partire dalla web root
         // tolgo il /front controller da $_SERVER['SCRIPT_NAME']
-        $cartella_installazione = str_replace('/'.$front_controller, '', $_SERVER['SCRIPT_NAME']);
+        $cartella_installazione = str_replace( DIRECTORY_SEPARATOR.$front_controller, '', $_SERVER['SCRIPT_NAME'] );
         
         Config::run()->set(
             array(
                 'web_server'             => $this->web_server(),
                 'path_base'              => $_SERVER['DOCUMENT_ROOT'].$cartella_installazione,
+                'path_app'               => $_SERVER['DOCUMENT_ROOT'].$cartella_installazione.DIRECTORY_SEPARATOR.'app',
+                'path_public'            => $_SERVER['DOCUMENT_ROOT'].$cartella_installazione.DIRECTORY_SEPARATOR.'public',
+                'path_temp'              => $_SERVER['DOCUMENT_ROOT'].$cartella_installazione.DIRECTORY_SEPARATOR.'temp',
                 'cartella_installazione' => $cartella_installazione,
                 'front_controller'       => '/'.$front_controller,
             )
