@@ -12,6 +12,8 @@
  */
 namespace Concerto;
 
+use Symfony\Component\Yaml\Parser;
+
 class App extends Singleton {
     
     /**
@@ -39,19 +41,35 @@ class App extends Singleton {
         // tramuto in array l'url interno
         $parametri = explode( '/' , $impostazioni['Concerto\Routing']['url_interno']);
         
-        // costruisco il nome dell'applicazione da caricare, nel seguente formato
-        // \namespace\App
-        $app = "\\".$parametri[1].'\App';
+        // istanzio un oggetto yaml parser
+        $yaml = new Parser(); 
+        
+        // il percorso del file app_pubbliche.yml
+        $file = $impostazioni['Concerto\Core']['path_app'] . DIRECTORY_SEPARATOR . 'Concerto' . DIRECTORY_SEPARATOR . 'app_pubbliche.yml';
 
-        // controllo se esiste l'App richiesta
-        if ( class_exists($app) )
-             // istanzio l'applicazione e gli passo il controllo
-            $app = new $app($parametri);
+        // leggo il file app_pubbliche.yml
+        $app_pubbliche = $yaml->parse(file_get_contents($file));
+
+        // controllo se l'app da avviare tramite url è nelle app_pubbliche
+        if (in_array( $parametri[1], $app_pubbliche ) ){
+            // costruisco il nome dell'applicazione da caricare, nel seguente formato
+            // \namespace\App
+            $app = "\\".$parametri[1].'\App';
+
+            // controllo se esiste l'App richiesta
+            if ( class_exists($app) )
+                 // istanzio l'applicazione e gli passo il controllo
+                $app = new $app($parametri);
+
+            // altrimenti gestisco l'errore
+            else    
+                throw new Eccezione('Errore non riesco a trovare: '.$app);
+        }
         
-        // altrimenti gestisco l'errore
-        else    
-            throw new Eccezione('Errore non riesco a trovare: '.$app);
-        
+        // altrimenti gestico l'errore, meglio non segnalare che non esiste l'app
+        else
+            throw new Eccezione('Errore non riesco a trovare: '.$parametri[1]);
+    
     }
     
 }

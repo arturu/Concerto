@@ -48,10 +48,13 @@ class Core extends Singleton {
         // $yaml = new \Symfony\Component\Yaml\Parser();
         $yaml = new Parser(); 
         
+        // recupero le impostazioni
         $impostazioni = Config::run()->mie();
         
+        // il percorso del file boot.yml
         $file = $impostazioni['path_app'] . DIRECTORY_SEPARATOR . 'Concerto' . DIRECTORY_SEPARATOR . 'boot.yml';
 
+        // leggo il file boot.yml
         $core_boot = $yaml->parse(file_get_contents($file));
 
         // avvio le applicazioni come da elenco
