@@ -13,6 +13,8 @@
 
 namespace Concerto;
 
+use Symfony\Component\Yaml\Parser;
+
 class Config extends Singleton {
 
     /**
@@ -34,21 +36,30 @@ class Config extends Singleton {
      *
      */
     protected function costruttore() {
-        $this->default_settings();
+        
     }
 
     /**
      * @todo Metodo che setta le impostazioni di default
      * @access private
      */
-    private function default_settings() {
-        $this->set( array(
-            'url' => array( 
-                'lingua_in_url' => true, // se nell'url deve essere presente la lingua
-                'lingua_su_terzo_livello' => false, // se true la lingua è il terzo livello xx.dominio.tld
-                'formato_lingua' => 'xx', // impostare se deve essere nel formato "xx", "xx-XX" oppure "xx_XX"
-            )
-        ));
+    public function default_settings() {
+        // recupero le impostazioni
+        $impostazioni = self::get();
+        
+        // istanzio un oggetto yaml parser
+        $yaml = new Parser(); 
+        
+        // il percorso del file response.yml contenente il tipo di response
+        $file = $impostazioni['Concerto\Core']['path_app'] . DIRECTORY_SEPARATOR . 
+                'Concerto' . DIRECTORY_SEPARATOR . 
+                'config'. DIRECTORY_SEPARATOR . 
+                'default_settings.yml';
+
+        // leggo il file app_pubbliche.yml
+        $default = $yaml->parse(file_get_contents($file));
+        
+        $this->set( $default );
     }
     
     /**

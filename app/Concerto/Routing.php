@@ -154,61 +154,44 @@ class Routing extends Singleton {
            $query_string = '/';
         
         // controllo se deve essere presente o meno la lingua nell'url
-        $query_string = $this->lingua($query_string);
+        $query_string = $this->rimuovi_lingua_url($query_string);
+        
+        // in caso c'è la '/' alla fine lo tolgo in quanto inutile
+        if ( substr($query_string, -1) == '/' )
+             $query_string = substr($query_string, 0, -1);
         
         return $query_string;
     }
     
     /**
-     * @todo Metodo che gestisce la presenza della lingua nell'url. Se '$aggiungi'
-     *       è uguale a 'false' e se la lingua è presente nella query string essa 
-     *       viene cancellata, altrimenti, viene aggiunta. 
+     * @todo Metodo che rimuove la lingua dall'url.
      * 
      * @param string $query_string
-     * @param bool $aggiungi
      * @return string
      */
-    private function lingua($query_string,$aggiungi=false){
+    private function rimuovi_lingua_url($query_string){
         // recupero le impostazioni
         $impostazioni = Config::run()->get();
         
-        if ( $impostazioni['Concerto\Config']['url']['lingua_in_url'] ) {
-            
-            // controllo il formato della lingua, e ne calcolo la lunghezza, "xx", "xx-XX" oppure "xx_XX"
-            $lunghezza = (int) strlen($impostazioni['Concerto\Config']['url']['formato_lingua']);
+        // mi stabilisco in che formato è la lingua nell'url
+        $formato = $this->formato_lingua_in_url();
 
-            // dalla lunghezza mi stabilisco in che formato è la lingua nell'url
-            $formato = ( $lunghezza==2 ) ? 'lingua' : 'locale';
+        // stabilisco se e quale è la lingua nella query string
+        $lingua = $this->lingua_in_url($query_string);
 
-            // prelevo la prima parte della query_string
-            // es substr( '/xx-XX/app/azione/variabile/valore', 0 , 6 ) == '/xx-XX'
-            $lingua_in_url = substr($query_string, 0, $lunghezza + 1);
+        // mi prelevo la lingua del browser dalla sessione in base al formato
+        $lingua_browser = $impostazioni['Concerto\Sessione']['Concerto\Locale'][$formato['formato']];
 
-            // mi prelevo la lingua dalla sessione in base al formato
-            $lingua_browser = $impostazioni['Concerto\Sessione']['Concerto\Locale'][$formato];
+        // in caso la lingua è già presente la cancello dalla $query_string
+        if ( $lingua ){
+            // la rimuovo dalla $query_string restituendo tutto quello che c'è dopo
+            // la lunghezza della lingua compreso lo "/" iniziale
+            $query_string = substr($query_string, $formato['lunghezza'] + 1);
 
-            // se la prima parte che ho prelevato da $query_string corrisponde alla lingua
-            // e bisogna cancellarla dalla $query_string
-            if ( $lingua_in_url == '/'.$lingua_browser && $aggiungi==false )
-                // la rimuovo dalla $query_string restituendo tutto quello che c'è dopo
-                // la lunghezza della lingua compreso lo "/" iniziale
-                $query_string = substr($query_string, $lunghezza + 1);
-            
-            // se devo aggiungere la lingua nella $query_string e essa non esiste la aggiungo
-            if ( $lingua_in_url != '/'.$lingua_browser && $aggiungi==true )
-                $query_string = '/'.$lingua_browser . $query_string;
-              
-            // se la parte che ho prelevato da $query_string è uguale alla lingua che devo
-            // inserire, significa che la $lingua è già nella $query_string, non devo fare nulla
-            ;
-            
-            // si potrebbe pensare che in caso di cambio lingua la precedente condizione risulti
-            // verificata, andando a costruire una $query_string simile a:
-            // /it-IT/en-EN/controller/action/...
-            // ma questo non si verifica, in quanto, quando viene eseguita la prima volta questa funzione:
-            // $this->costruttore()->set()->query_string()->lingua();
-            // viene tolta, non bisogna fare nulla
-            ;
+            // in caso la lingua presente nell'url è diversa da quella del browser
+            // chiedo un cambio lingua
+            if ( $lingua[$formato['formato']] != $lingua_browser )
+                Locale::run()->cambio($lingua);
         }
             
         return $query_string;
@@ -216,26 +199,99 @@ class Routing extends Singleton {
     }
     
     /**
-     * @todo Questo metodo genera un url assoluto, utile per collegare più pagine
-     *       tra di loro. N.B. da utilizzare solo per collegare pagine e non file
-     *       statici, per quest'ultimo caso esiste un apposito metodo.
+     * Stabilisce se inserire la lingua nell'url
      * 
      * @param string $query_string
+     * @param string $lingua
      * @return string
      */
-    public function costruisci_url_assoluto($query_string) {
+    public function aggiungi_lingua_url($query_string,$lingua=false) {
         // recupero le impostazioni
         $impostazioni = Config::run()->get();
         
-        // aggiungo eventualmente la lingua
-        $query_string = $this->lingua($query_string,true);
+        // se la lingua deve essere presente nell'url
+        if ( $impostazioni['Concerto\Config']['url']['lingua_in_url'] ) {
+            // stabilisco in che formato è la lingua nell'url
+            $formato = $this->formato_lingua_in_url();
+            
+            // prelevo la lingua del browser dalla sessione in base al formato
+            $lingua_browser = $impostazioni['Concerto\Sessione']['Concerto\Locale'][$formato['formato']];
         
-        // costruisco l'url assoluto, ['base_url'] arriva già impostato in base al rewriting
-        $url = $impostazioni['Concerto\Routing']['base_url'] . $query_string;
+            // se nella query_string viene inserita accidentalmente la lingua la rimuovo
+            $query_string = $this->rimuovi_lingua_url($query_string);
+            
+            // imposto la lingua inviata come parametro se è tra le lingue attive
+            if ( $lingua && isset($impostazioni['Concerto\Locale']['lingue']['lingue_attive'][$lingua]) )
+                $query_string = '/'.$impostazioni['Concerto\Locale']['lingue']['lingue_attive'][$lingua][$formato['formato']]. $query_string;
+            
+            // altrimenti imposto quella del browser
+            else 
+                // la aggiungo alla query_string
+                $query_string = '/'.$lingua_browser . $query_string;
+        }
         
-        return $url;
+        return $query_string;
+
+    }
+    
+    /**
+     * Stabilisce se e quale lingua è nella query_string
+     * 
+     * @param type $query_string
+     * @return boolean || string
+     */
+    private function lingua_in_url($query_string){
+        // recupero le impostazioni
+        $impostazioni = Config::run()->get();
+
+        // stabilisco in che formato è la lingua nell'url, lingua o locale
+        $formato = $this->formato_lingua_in_url();
+
+        // prelevo la prima parte della query_string a seconda del formato['lunghezza']
+        // es substr( '/xx-XX/app/azione/variabile/valore', 0 , 6 ) == '/xx-XX'
+        $lingua_in_url = substr($query_string, 0, $formato['lunghezza'] + 1);
+        
+        // ciclo con tutte le lingue attive per vedere quale è stata passata tramite url
+        foreach ($impostazioni['Concerto\Locale']['lingue']['lingue_attive'] as $key => $value) {
+            if ( '/'.$value[$formato['formato']] == $lingua_in_url )
+                // in caso la trovo la restituisco
+                return $value;
+        }
+        
+        // in caso non è stata trovata nessuna lingua restituisco false
+        return false;
+    }
+    
+    /**
+     * Stabilisce in che formato è la lingua nell'url
+     * 
+     * @return array('formato'=>xx,'lunghezza'=>0)
+     */
+    private function formato_lingua_in_url (){
+        // recupero le impostazioni
+        $impostazioni = Config::run()->get();
+        
+        // controllo il formato della lingua, e ne calcolo la lunghezza, "xx", "xx-XX" oppure "xx_XX"
+        $lunghezza = (int) strlen($impostazioni['Concerto\Config']['url']['formato_lingua']);
+
+        // dalla lunghezza mi stabilisco in che formato è la lingua nell'url e lo restituisco
+        $formato = ( $lunghezza==2 ) ? 'lingua' : 'locale';
+        
+        return array('formato'=>$formato,'lunghezza'=>$lunghezza);
+    }
+    
+    /**
+     * Metodo utilizzato da Concerto\Response per pulire l'url_interno dal tipo di formato 
+     * 
+     * @param string $estensione
+     */
+    public function pulisci_tipo_formato($estensione) {
+        // recupero le mie impostazioni
+        $impostazioni = Config::run()->mie();
+        
+        $url_interno = str_replace('.'.$estensione, '', $impostazioni['url_interno']);
+        
+        Config::run()->set( array('url_interno'=>$url_interno) );
     }
     
 }
-
-

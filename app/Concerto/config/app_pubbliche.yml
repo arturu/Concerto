@@ -1,0 +1,5 @@
+## File di configurazione /app/Concerto/config/app_pubbliche.yml
+## Definisce quale sia l'app di default e quali app sono abilitate all'uso pubblico
+default_app: Test
+app_pubbliche:
+- Test

@@ -53,7 +53,7 @@ class Request extends Singleton {
                 'metodo'              => $_SERVER['REQUEST_METHOD'],
                 'get'                 => $_GET,
                 'post'                => $_POST,
-                'stato_richiesta'     => $_SERVER['REDIRECT_STATUS'],
+                'stato_richiesta'     => isset($_SERVER['REDIRECT_STATUS'])?$_SERVER['REDIRECT_STATUS']:false,
                 'richiesta'           => $richiesta,
                 'parametri_get'       => $_SERVER['QUERY_STRING'],
                 'redirect_url'        => $redirect,

@@ -1,9 +1,11 @@
-## YAML boot
+## File di configurazione /app/Concerto/config/boot.yml
+## Definisce l'ordine di avvio dei var gestori
+
 #- \Concerto\Security      # analizza gli input
 - \Concerto\Sessione      # il gestore della sessione
 - \Concerto\Locale        # gestore della localizzazione
 - \Concerto\Request       # gestore delle richieste
 - \Concerto\Routing       # routing
-- \Concerto\App           #gestore delle applicazioni
-#- \Concerto\Response      # gestore di response
+- \Concerto\Response      # gestore di response
+- \Concerto\App           # gestore delle applicazioni
 #- \Concerto\Template      # gestore di template

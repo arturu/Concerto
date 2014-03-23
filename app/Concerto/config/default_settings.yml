@@ -1,0 +1,9 @@
+## File di configurazione /app/Concerto/config/default_settings.yml
+## Definisce le impostazioni di default
+url:
+  lingua_in_url: true
+  lingua_su_terzo_livello: false
+  formato_lingua: xx
+  
+debug_mode: true
+  

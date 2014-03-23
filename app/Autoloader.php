@@ -27,7 +27,6 @@ spl_autoload_register(
             return true;
         }
         
-        return false;
-
+        throw new Concerto\Eccezione('Non riesco ad accedere a: '.$file);
     });
     

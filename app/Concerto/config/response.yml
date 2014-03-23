@@ -1,0 +1,9 @@
+## File di configurazione /app/Concerto/config/response.yml
+## Definisce i tipi di response nel formato \namespace\tipo
+default: \Render\html
+default_namespace: \Render\
+riconoscimento_automatico: true
+tipi_abilitati:
+  - \Render\html
+  - \Render\json
+  - \Render\xml

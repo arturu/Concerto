@@ -9,13 +9,16 @@
  * @author Pietro Arturo Panetta arturopanetta@gmail.com
  * @todo Concerto è un software modulare per lo sviluppo di applicazioni web.
  */
-  
+
 try {
     // carico l'Autoload delle classi
     require_once( 'app' . DIRECTORY_SEPARATOR . 'Autoloader.php' );
 
     // avvio del Core
     Concerto\Core::run();
+    
+    // restituisco i risultati
+    Concerto\Response::run()->render();
     
 } catch (Concerto\Eccezione $e) { // Oggetto Eccezione
     

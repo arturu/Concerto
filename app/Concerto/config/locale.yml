@@ -1,0 +1,15 @@
+## File di configurazione /app/Concerto/config/locale.yml
+## Definisce l'elenco delle lingue attive
+default:
+  lingua: it
+  locale: it-IT
+  label: Italiano
+
+lingue_attive:
+  English US:
+    lingua: en
+    locale: en-US
+  Italiano:
+    lingua: it
+    locale: it-IT
+ 

@@ -13,10 +13,6 @@
 
 namespace Concerto;
 
-// per poter utilizzare il parser YAML
-// si potrebbe anche evitare questa riga, ma alla riga 49 bisogna instanziare il parser con
-// $yaml = new \Symfony\Component\Yaml\Parser();
-// che non è molto bello
 use Symfony\Component\Yaml\Parser;
 
 class Core extends Singleton {
@@ -35,6 +31,8 @@ class Core extends Singleton {
     protected function costruttore(){
         $this->set();
         
+        Config::run()->default_settings();
+        
         $this->boot();
     } // fine costruttore()
     
@@ -43,16 +41,18 @@ class Core extends Singleton {
      * @access public
      */
     public function boot() {
-
-        // se non dichiarato il namespace all'inizio bisogna instanziare con
-        // $yaml = new \Symfony\Component\Yaml\Parser();
+        
+        // istanzio l'oggeto parser
         $yaml = new Parser(); 
         
         // recupero le impostazioni
         $impostazioni = Config::run()->mie();
-        
+
         // il percorso del file boot.yml
-        $file = $impostazioni['path_app'] . DIRECTORY_SEPARATOR . 'Concerto' . DIRECTORY_SEPARATOR . 'boot.yml';
+        $file = $impostazioni['path_app'] . DIRECTORY_SEPARATOR . 
+                'Concerto' . DIRECTORY_SEPARATOR . 
+                'config'. DIRECTORY_SEPARATOR . 
+                'boot.yml';
 
         // leggo il file boot.yml
         $core_boot = $yaml->parse(file_get_contents($file));
