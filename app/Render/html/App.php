@@ -15,8 +15,16 @@ namespace Render\html;
 
 class App extends \Render\xml\App {
     
-    public function __construct($render) {
-        echo $render;
+    // il nome della cartella dove è salvata la vista della specifica App
+    // i metodi che utilizzano questo attributo 
+    // caricheranno da NomeApp/vista/html/vista.php da caricare
+    var $render = 'html';
+    
+    public function __construct() {
+        
+        // genero la l'output
+        $this->render();
+
     }
     
 }

@@ -13,11 +13,16 @@
 
 namespace Render\json;
 
+use Concerto\Response;
+
 class App {
     
-    public function __construct($render) {
+    public function __construct() {
+        
+        $output = Response::run()->get_response();
+        
         header('Content-type: application/json');
-        echo json_encode($render);
+        echo json_encode($output);
     }
     
 }

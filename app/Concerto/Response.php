@@ -27,9 +27,16 @@ class Response extends Singleton {
     /**
      * @todo vettore dove viene salvato l'output delle App
      * @access private
-     * @var 
+     * @var mix
      */
     private $response;
+    
+    /**
+     * Imposta la vista da utilizzare
+     * 
+     * @var string
+     */
+    public $vista;
     
     /**
      * La visualizzazione Eseguita
@@ -138,10 +145,41 @@ class Response extends Singleton {
     /**
      * Le app utilizzano questo metodo per salvare l'output
      * 
+     * @param type $reponse - il response da salvare
+     * @param string $chiave - un identificatore per poter inserire più response
+     */
+    public function set_response ($response,$chiave=false){
+        if ($chiave)
+            $this->response[$chiave] = $response;
+        else
+            $this->response = $response;
+    }
+        
+    /**
+     * Il response usa questo metodo per accedere ai dati da visualizzare
+     * 
      * @param type $reponse
      */
-    public function set_response ($response){
-        $this->response = $response;
+    public function get_response (){
+        return $this->response;
+    }
+    
+    /**
+     * Le app utilizzano questo metodo per salvare la vista da caricare
+     * 
+     * @param type $reponse
+     */
+    public function set_vista ($vista){
+        $this->vista = $vista;
+    }
+      
+    /**
+     * Il response recupera da vista da renderizzare tramite questo metodo
+     * 
+     * @param type $reponse
+     */
+    public function get_vista(){
+        return $this->vista;
     }
     
     /**
@@ -156,7 +194,7 @@ class Response extends Singleton {
         $r = $impostazioni['Concerto\Response']['formato'].'\App';
         
         // in base al formato corrente avvio l'app che gestisce il tipo di response
-        $this->app = new $r($this->response);
+        $this->app = new $r();
         
         // debug output
         if ( $impostazioni['Concerto\Config']['debug_mode'] )

@@ -2,6 +2,8 @@
 namespace Test;
 
 use Concerto\Response;
+use Concerto\Config;
+use Symfony\Component\Yaml\Parser;
 
 class App {
     
@@ -11,14 +13,21 @@ class App {
     
     public function default_action($parametri) {
         
-        Response::run()->set_response('<div>
-            <h1>Hello, World!</h1>
-            <a href="'.\Concerto\Utility::costruisci_url_assoluto_app('/1/2/3','English US').'">English US Link</a><br />'.
-            '<a href="'.\Concerto\Utility::costruisci_url_assoluto('/articolo-del-cms.html','Italiano').'">Articolo in Italiano</a><br />'.  
-            '<a href="'.\Concerto\Utility::costruisci_url_assoluto_app('/Controller/View/1.xml','Italiano').'">XML Page</a><br />'.  
-            '<a href="'.\Concerto\Utility::costruisci_url_assoluto_app('/Controller/View/1.json','Italiano').'">JSON Page</a><br />'.
-            '</div>'
-        );
+        // recupero le impostazioni
+        $impostazioni = Config::run()->get();
+        
+        // istanzio un oggetto yaml parser
+        $yaml = new Parser(); 
+        
+        // recupero i dati di output
+        $dati = $yaml->parse(file_get_contents(
+            $impostazioni['Concerto\Core']['path_app'] . DIRECTORY_SEPARATOR . 
+            'Test' . DIRECTORY_SEPARATOR .
+            'articolo_1.yml'
+        ));
+        
+        Response::run()->set_response($dati);
+        Response::run()->set_vista('articolo');
         
     }
 }
